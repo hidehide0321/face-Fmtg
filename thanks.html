@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>送信ありがとうございました</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .thank-hero {
+        display: flex; align-items: center; gap: 16px; margin-bottom: 8px;
+      }
+      .stamp {
+        width: 64px; height: 64px; border-radius: 50%;
+        display: grid; place-items: center; color: #fff;
+        background: linear-gradient(180deg, var(--main), var(--accent));
+        box-shadow: 0 6px 14px rgba(245,162,120,.25), 0 2px 5px rgba(232,132,130,.18);
+      }
+      .stamp span { font-size: 32px; line-height: 1; }
+      .lead { margin: 0; font-size: 1.1rem; color: var(--muted); }
+      .actions { justify-content: flex-start; }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <div class="thank-hero">
+          <div class="stamp" aria-hidden="true"><span>✓</span></div>
+          <div>
+            <h1 style="margin:0 0 4px">ありがとうございます</h1>
+            <p id="lead" class="lead">ご入力ありがとうございました！</p>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top: 16px;">
+          <a href="./index.html" class="btn-a primary-as-a" aria-label="フォームに戻る">
+            <button class="primary" type="button">フォームに戻る</button>
+          </a>
+          <a href="./" class="btn-a secondary-as-a" aria-label="トップへ">
+            <button class="secondary" type="button">トップへ</button>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // URLクエリ ?msg=... があれば優先的に表示
+      (function(){
+        try {
+          const params = new URLSearchParams(location.search);
+          const msg = params.get('msg');
+          if (msg) document.getElementById('lead').textContent = msg;
+        } catch (_) {}
+      })();
+    </script>
+  </body>
+  </html>
+

@@ -1,0 +1,56 @@
+{
+  "siteName": "サイトアンケート",
+  "gasEndpoint": "https://script.google.com/macros/s/XXXXXXXXXXXX/exec",
+  "token": "REPLACE_WITH_YOUR_TOKEN",
+  "form": {
+    "title": "ご意見・ご要望フォーム",
+    "description": "サービス改善のため、率直なフィードバックをお寄せください。* は必須です。",
+    "fields": [
+      {
+        "id": "name",
+        "label": "お名前",
+        "type": "text",
+        "required": true,
+        "placeholder": "例）山田 太郎",
+        "validation": { "minLength": 2, "maxLength": 50 }
+      },
+      {
+        "id": "email",
+        "label": "メールアドレス",
+        "type": "email",
+        "required": true,
+        "placeholder": "example@example.com",
+        "validation": { "type": "email" }
+      },
+      {
+        "id": "satisfaction",
+        "label": "満足度",
+        "type": "radio",
+        "required": true,
+        "options": [
+          { "label": "とても満足", "value": "5" },
+          { "label": "満足", "value": "4" },
+          { "label": "ふつう", "value": "3" },
+          { "label": "やや不満", "value": "2" },
+          { "label": "不満", "value": "1" }
+        ]
+      },
+      {
+        "id": "improve",
+        "label": "改善してほしい点",
+        "type": "textarea",
+        "required": false,
+        "placeholder": "自由にご記入ください（500文字以内）",
+        "validation": { "maxLength": 500 }
+      },
+      {
+        "id": "consent",
+        "label": "プライバシーポリシーに同意する",
+        "type": "checkbox",
+        "required": true,
+        "options": [ { "label": "同意する", "value": "agree" } ]
+      }
+    ]
+  }
+}
+

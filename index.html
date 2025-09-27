@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>アンケート</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      // Fallback config for file:// or when config.json is not reachable
+      window.CONFIG = {
+        siteName: "お申込みフォーム",
+        SUCCESS_MESSAGE: "お申込みありがとうございました。日程についてはこちらからご連絡差し上げます。少々お待ちください。",
+        gasEndpoint: "",
+        token: "",
+        form: {
+          title: "お申込みフォーム",
+          description: "必要事項をご入力のうえ送信してください。* は必須です。",
+          successMessage: "お申込みありがとうございました。日程についてはこちらからご連絡差し上げます。少々お待ちください。",
+          fieldsString: "事業所名、業種、お名前, メールアドレス, 相談内容、希望日時、希望日時、希望日時"
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <main class="container" aria-live="polite">
+      <header class="header">
+        <h1 id="siteTitle">アンケート</h1>
+        <p id="formDescription" class="muted"></p>
+      </header>
+
+      <section id="formRoot" class="card" aria-busy="true">
+        <div class="loading">設定を読み込んでいます...</div>
+      </section>
+
+      <section id="status" class="status" aria-live="polite" aria-atomic="true"></section>
+    </main>
+
+    <script src="./app.js" defer></script>
+  </body>
+  </html>
