@@ -147,7 +147,7 @@
       submitBtn.disabled = true;
       showStatus('送信中...', '');
       try {
-        await submit(cfg, data);
+        await submitWrapper(cfg, data);
         form.reset();
         const msg = cfg.SUCCESS_MESSAGE || cfg.successMessage || (cfg.form && cfg.form.successMessage) || '送信が完了しました。ご協力ありがとうございます。';
         showStatus(msg, 'ok');
@@ -346,6 +346,10 @@
       headerLabels: getRenderedFieldLabels(),
       fields: data,
     };
+    // file:// で開いた場合は iframe 経由で送信（CORS回避）
+    if (location.protocol === 'file:') {
+      return await submitViaIframe(cfg, payload);
+    }
     const body = new URLSearchParams({ payload: JSON.stringify(payload) });
     const resp = await fetch(cfg.gasEndpoint, {
       method: 'POST',
@@ -377,6 +381,81 @@
 
   // Override with rendered-schema aware versions
   function getRenderedMeta(form) { try { return JSON.parse(form?.dataset?.fields || '[]'); } catch { return []; } }
+
+  // --- CORS回避用: hidden iframe でPOST ---
+  function ensureHiddenIframe(name = 'hidden_iframe') {
+    let iframe = document.querySelector(`iframe[name="${name}"]`);
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.name = name;
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+    return iframe;
+  }
+
+  function submitViaIframe(cfg, payload) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (!cfg.gasEndpoint) throw new Error('gasEndpoint が未設定です');
+        const iframe = ensureHiddenIframe();
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = cfg.gasEndpoint;
+        form.target = 'hidden_iframe';
+        form.style.display = 'none';
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'payload';
+        input.value = JSON.stringify(payload);
+        form.appendChild(input);
+        if (cfg.token) {
+          const tok = document.createElement('input');
+          tok.type = 'hidden';
+          tok.name = 'token';
+          tok.value = cfg.token;
+          form.appendChild(tok);
+        }
+        const onLoad = () => {
+          iframe.removeEventListener('load', onLoad);
+          resolve({ ok: true });
+          try { form.remove(); } catch {}
+        };
+        iframe.addEventListener('load', onLoad);
+        document.body.appendChild(form);
+        form.submit();
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  // フォーム送信の実体（fetch）に、iframeフォールバックをかけるラッパ
+  async function submitWrapper(cfg, data) {
+    // file:// で開いている場合は最初から iframe で送信
+    if (location.protocol === 'file:') {
+      const payload1 = {
+        token: cfg.token || '',
+        meta: { siteName: cfg.siteName || '', formTitle: (cfg.form && cfg.form.title) || '', ts: new Date().toISOString() },
+        order: getRenderedFieldIds(),
+        headerLabels: getRenderedFieldLabels(),
+        fields: data,
+      };
+      return await submitViaIframe(cfg, payload1);
+    }
+    try {
+      return await submit(cfg, data);
+    } catch (err) {
+      const payload2 = {
+        token: cfg.token || '',
+        meta: { siteName: cfg.siteName || '', formTitle: (cfg.form && cfg.form.title) || '', ts: new Date().toISOString() },
+        order: getRenderedFieldIds(),
+        headerLabels: getRenderedFieldLabels(),
+        fields: data,
+      };
+      return await submitViaIframe(cfg, payload2);
+    }
+  }
 
   function collectForm(cfg, form) {
     const out = {};
